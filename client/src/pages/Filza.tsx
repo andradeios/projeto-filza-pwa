@@ -14,40 +14,25 @@ export default function Filza() {
     }
   }, [setLocation]);
 
+  // Função de logout (caso queira chamar de dentro do Filza no futuro)
   const handleLogout = () => {
     localStorage.removeItem("isLoggedIn");
     localStorage.removeItem("username");
     setLocation("/login");
   };
 
-  const username = localStorage.getItem("username");
-
   return (
-    <div className="w-full min-h-screen bg-background flex flex-col">
-      {/* Header com botão de logout */}
-      <div className="bg-card border-b border-border px-4 py-3 flex justify-between items-center">
-        <h1 className="text-lg font-semibold text-foreground">INJETOR DE XIT</h1>
-        <div className="flex items-center gap-4">
-          <span className="text-sm text-muted-foreground">Bem-vindo, <span className="text-primary font-semibold">{username}</span></span>
-          <button
-            onClick={handleLogout}
-            className="px-4 py-2 bg-primary hover:bg-red-700 text-white rounded-lg text-sm font-medium transition-colors"
-          >
-            Sair
-          </button>
-        </div>
-      </div>
-
-      {/* Conteúdo do Filza */}
-      <div className="flex-1 flex items-center justify-center p-2">
-        <div className="w-full max-w-md bg-background rounded-3xl shadow-2xl overflow-hidden border border-border/50">
-          <FilzaFileManager
-            onItemClick={(item) => {
-              console.log('Clicked item:', item);
-            }}
-          />
-        </div>
-      </div>
+    <div className="w-full min-h-screen bg-background">
+      {/* O FilzaFileManager agora ocupa 100% da viewport.
+          Removidos: Header externo, títulos, bordas arredondadas e sombras.
+      */}
+      <FilzaFileManager
+        onItemClick={(item) => {
+          console.log('Item selecionado:', item.name);
+          // Se quiser que o botão de "Sair" funcione dentro do Filza, 
+          // você pode passar o handleLogout como prop para ele.
+        }}
+      />
     </div>
   );
 }

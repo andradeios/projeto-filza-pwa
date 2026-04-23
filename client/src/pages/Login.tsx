@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react"; // 1. Adicione o useEffect aqui
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,7 +8,19 @@ export default function Login() {
   const [, setLocation] = useLocation();
   const [accessKey, setAccessKey] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(false); // Estado para mostrar erro se a key estiver errada
+  const [error, setError] = useState(false);
+  
+  // 2. Estado para saber se o usuário quer ser lembrado
+  const [rememberMe, setRememberMe] = useState(false);
+
+  // 3. Carregar a chave salva quando abrir a página
+  useEffect(() => {
+    const savedKey = localStorage.getItem("key_salva");
+    if (savedKey) {
+      setAccessKey(savedKey);
+      setRememberMe(true);
+    }
+  }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -16,20 +28,25 @@ export default function Login() {
     setError(false);
     
     setTimeout(() => {
-      // AQUI ESTÁ A SUA KEY
       if (accessKey === "INJETOR-DE-XIT") {
+        // 4. Lógica para salvar ou remover a chave da memória
+        if (rememberMe) {
+          localStorage.setItem("key_salva", accessKey);
+        } else {
+          localStorage.removeItem("key_salva");
+        }
+
         localStorage.setItem("isLoggedIn", "true");
         localStorage.setItem("userKey", accessKey);
         setLocation("/dashboard");
       } else {
-        setError(true); // Ativa o erro se a key for diferente
+        setError(true);
         alert("Chave de Acesso Incorreta!");
       }
       setIsLoading(false);
     }, 1000);
   };
 
-  // O botão só fica desabilitado se o campo estiver vazio ou se estiver carregando
   const isButtonDisabled = accessKey.trim() === "" || isLoading;
 
   return (
@@ -50,10 +67,7 @@ export default function Login() {
         <div className="bg-card border border-border rounded-xl p-8 shadow-2xl backdrop-blur-sm">
           <form onSubmit={handleLogin} className="space-y-6">
             <div className="space-y-2">
-              <Label 
-                htmlFor="accessKey" 
-                className="text-sm font-medium text-foreground"
-              >
+              <Label htmlFor="accessKey" className="text-sm font-medium text-foreground">
                 Chave de Acesso (Key)
               </Label>
               <Input
@@ -65,31 +79,33 @@ export default function Login() {
                   setAccessKey(e.target.value);
                   setError(false);
                 }}
-                className={`bg-secondary border-border text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/30 transition-all duration-200 ${error ? 'border-red-500' : ''}`}
+                className={`bg-secondary border-border text-foreground focus:ring-primary/30 ${error ? 'border-red-500' : ''}`}
               />
-              {error && <p className="text-red-500 text-xs mt-1">Chave inválida. Tente novamente.</p>}
+            </div>
+
+            {/* 5. O BOTÃO/CHECKBOX DE LEMBRAR KEY */}
+            <div className="flex items-center gap-2 px-1">
+              <input 
+                type="checkbox" 
+                id="remember" 
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+                className="w-4 h-4 accent-red-600 cursor-pointer"
+              />
+              <label htmlFor="remember" className="text-sm text-gray-400 cursor-pointer select-none">
+                Lembrar minha chave
+              </label>
             </div>
 
             <Button
               type="submit"
               disabled={isButtonDisabled}
-              className="w-full bg-primary hover:bg-red-700 text-primary-foreground font-semibold py-2.5 rounded-lg transition-all duration-200 shadow-lg shadow-red-600/30 hover:shadow-red-600/50 disabled:opacity-30 disabled:cursor-not-allowed"
+              className="w-full bg-primary hover:bg-red-700 text-primary-foreground font-semibold py-2.5 rounded-lg shadow-lg shadow-red-600/30"
             >
-              {isLoading ? (
-                <span className="flex items-center gap-2">
-                  <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                  Verificando...
-                </span>
-              ) : (
-                "Entrar no Painel"
-              )}
+              {isLoading ? "Verificando..." : "Entrar no Painel"}
             </Button>
           </form>
         </div>
-
-        <p className="text-center text-xs text-muted-foreground mt-8">
-          © 2026 Injetor de Xit. Todos os direitos reservados.
-        </p>
       </div>
     </div>
   );
