@@ -102,7 +102,7 @@ export default function Login() {
               disabled={isButtonDisabled}
               className="w-full bg-primary hover:bg-red-700 text-primary-foreground font-semibold py-2.5 rounded-lg shadow-lg shadow-red-600/30"
             >
-              {isLoading ? "Verificando..." : "Entrar no Painel"}
+              {isLoading ? "Verificando..." : "Entrar no Injetor"}
             </Button>
           </form>
         </div>
